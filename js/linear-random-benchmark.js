@@ -30,35 +30,71 @@ var svg = d3.select("body").append("svg")
 console.time('data generation');
 
 var data = generateData(10000, 500, 1000);
+var dataArr = data.map(function(point){
+    return [point.x, point.y];
+});
+var dataY = data.map(function(point){
+    return point.y;
+});
 
 console.timeEnd('data generation');
 
-console.time('processing and rendering');
+testD3();
+testFlot();
+testHigh();
 
-x.domain(d3.extent(data, function(d) { return d.x; }));
-y.domain(d3.extent(data, function(d) { return d.y; }));
+function testD3(){
+    console.time('D3: processing and rendering');
 
-svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(xAxis);
+    x.domain(d3.extent(data, function(d) { return d.x; }));
+    y.domain(d3.extent(data, function(d) { return d.y; }));
 
-svg.append("g")
-    .attr("class", "y axis")
-    .call(yAxis)
-    .append("text")
-    .attr("transform", "rotate(-90)")
-    .attr("y", 6)
-    .attr("dy", ".71em")
-    .style("text-anchor", "end")
-    .text("Price ($)");
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
 
-svg.append("path")
-    .datum(data)
-    .attr("class", "line")
-    .attr("d", line);
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Price ($)");
 
-console.timeEnd('processing and rendering');
+    svg.append("path")
+        .datum(data)
+        .attr("class", "line")
+        .attr("d", line);
+
+    console.timeEnd('D3: processing and rendering');
+}
+
+function testFlot(){
+    console.time('Flot: processing and rendering');
+
+    $('#flot').plot([dataArr]);
+
+    console.timeEnd('Flot: processing and rendering');
+}
+
+function testHigh(){
+    console.time('Highcharts: processing and rendering');
+
+    $('#high').highcharts({
+        chart: {
+            type: 'line'
+        },
+        series: [{
+            name: 'sample',
+            data: dataY
+        }]
+    });
+
+    console.timeEnd('Highcharts: processing and rendering');
+}
 
 
 function generateData(amount, min, max) {
